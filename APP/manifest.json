@@ -1,0 +1,20 @@
+{
+  "name": "ROPERS",
+  "short_name": "ROPERS",
+  "start_url": "/pwa/login",
+  "display": "standalone",
+  "background_color": "#e4e1dd",
+  "theme_color": "#f1693c",
+  "icons": [
+    {
+      "src": "/pwa/assets/logo_s-name192_trasn.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa/assets/logo_sem_nome512px.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
