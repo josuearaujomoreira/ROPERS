@@ -17,10 +17,11 @@ switch ($request) {
     case 'cadastro':
         require __DIR__ . '/../app/Controllers/CadastroController.php';
         break;
-
+    case 'painel-cliente':
+        require __DIR__ . '/../app/Controllers/CadastroController.php';
+        break;
     default:
         http_response_code(404);
         echo "Página não encontrada!";
         break;
 }
-    
