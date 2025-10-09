@@ -1,8 +1,10 @@
 <?php
 require __DIR__ . '/../Config/database.php';
+session_start(); // <-- inicia a sessão
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = $_POST['nome'] ?? '';
+    $senha = $_POST['senha'] ?? '';
     $apelido = $_POST['apelido'] ?? '';
     $cpf = $_POST['cpf'] ?? '';
     $whatsapp = $_POST['whatsapp'] ?? '';
@@ -30,8 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Salvar no banco
         $stmt = $pdo->prepare("
-            INSERT INTO lacadores (nome, apelido, cpf, whatsapp, cidade, uf, handicap_cabeca, handicap_pe, foto)
-            VALUES (:nome, :apelido, :cpf, :whatsapp, :cidade, :uf, :handicap_cabeca, :handicap_pe, :foto)
+            INSERT INTO lacadores (nome, apelido, cpf,senha, whatsapp, cidade, uf, handicap_cabeca, handicap_pe, foto)
+            VALUES (:nome, :apelido, :cpf, :senha ,:whatsapp, :cidade, :uf, :handicap_cabeca, :handicap_pe, :foto)
         ");
 
         try {
@@ -39,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':nome' => $nome,
                 ':apelido' => $apelido,
                 ':cpf' => $cpf,
+                ':senha' => $senha,
                 ':whatsapp' => $whatsapp,
                 ':cidade' => $cidade,
                 ':uf' => $uf,
@@ -47,8 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':foto' => $fotoNome
             ]);
 
-            // Redireciona para o painel do cliente (mesmo que a view ainda não exista)
-            header('Location: /pwa/painel-cliente?id=' . $pdo->lastInsertId());
+            $lastId = $pdo->lastInsertId();
+
+            // cria sessão do usuário
+            $_SESSION['usuario_id'] = $lastId;
+            $_SESSION['usuario_nome'] = $nome;
+
+            // redireciona pro painel protegido
+            header('Location: /pwa/painel-cliente');
             exit;
 
         } catch (PDOException $e) {

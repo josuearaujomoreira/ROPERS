@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,7 +51,7 @@
             margin-bottom: 15px;
         }
 
-        h1 {
+        h3 {
             margin: 10px 0 20px;
             color: #2c1b18;
             font-size: clamp(20px, 5vw, 26px);
@@ -105,6 +104,16 @@
             text-decoration: none;
         }
 
+        .erro {
+            background: #ffe0e0;
+            color: #a33;
+            border: 1px solid #f99;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 20px 15px;
@@ -121,18 +130,41 @@
     <div class="overlay"></div>
 
     <div class="container">
-
-
         <img src="/pwa/assets/logo512px_transparente.png" style="margin-bottom: -8px;" alt="Logo" class="logo">
 
         <h3>Login</h3>
+
+        <?php if (isset($erro)): ?>
+            <div class="erro"><?= htmlspecialchars($erro) ?></div>
+        <?php endif; ?>
+
         <form method="POST" action="/pwa/login">
-            <input type="text" name="usuario" placeholder="Usuário" required>
+            <input type="text" name="cpf" id="cpf" placeholder="CPF (000.000.000-00)" maxlength="14" required>
             <input type="password" name="senha" placeholder="Senha" required>
             <button type="submit">Entrar</button>
         </form>
+
         <p class="link">Ainda não tem conta? <a href="/pwa/cadastro">Cadastre-se</a></p>
     </div>
-</body>
 
+    <script>
+        const cpfInput = document.getElementById('cpf');
+
+        cpfInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, ''); // remove tudo que não for número
+
+            if (value.length > 11) value = value.slice(0, 11);
+
+            if (value.length > 9) {
+                value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+            } else if (value.length > 6) {
+                value = value.replace(/^(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+            } else if (value.length > 3) {
+                value = value.replace(/^(\d{3})(\d{0,3})/, '$1.$2');
+            }
+
+            e.target.value = value;
+        });
+    </script>
+</body>
 </html>

@@ -1,17 +1,33 @@
 <?php
 // app/Controllers/LoginController.php
+require __DIR__ . '/../app/Config/database.php';
+session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
+    $cpf = $_POST['cpf'] ?? '';
     $senha = $_POST['senha'] ?? '';
 
-    // Exemplo simples (depois conecta no banco)
-    if ($email === 'teste@teste.com' && $senha === '123') {
-        echo "Login realizado com sucesso!";
-        exit;
+    if (empty($cpf) || empty($senha)) {
+        $erro = "Por favor, preencha CPF e senha.";
     } else {
-        $erro = "Usuário ou senha inválidos.";
+        // Busca usuário no banco
+        $stmt = $pdo->prepare("SELECT id, nome, senha FROM lacadores WHERE cpf = :cpf LIMIT 1");
+        $stmt->execute([':cpf' => $cpf]);
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuario && $usuario['senha'] === $senha) {
+            // Cria sessão
+            $_SESSION['usuario_id'] = $usuario['id'];
+            $_SESSION['usuario_nome'] = $usuario['nome'];
+
+            // Redireciona para o painel
+            header('Location: /pwa/painel-cliente');
+            exit;
+        } else {
+            $erro = "CPF ou senha inválidos.";
+        }
     }
 }
 
+// Carrega a view de login
 require __DIR__ . '/../Views/login.php';

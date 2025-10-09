@@ -166,6 +166,7 @@
       <input type="text" name="apelido" placeholder="Apelido" required>
       <input type="text" id="cpf" name="cpf" placeholder="CPF" maxlength="14" required>
       <p id="cpfErro" style="color:red; font-size:13px; display:none; margin-top:-5px;">CPF inválido</p>
+       <input type="text" id="senha" name="senha"   placeholder="Senha" minlength="6" required>
 
       <input type="text" id="whatsapp" name="whatsapp" placeholder="Whatsapp" maxlength="15" required>
       <input type="text" name="cidade" placeholder="Cidade" required>
