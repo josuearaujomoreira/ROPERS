@@ -1,170 +1,177 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="manifest" href="/pwa/manifest.json">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="manifest" href="/pwa/manifest.json">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: url("https://cavalus.com.br/wp-content/uploads/2018/06/LacoPe-Kito-01.jpg") no-repeat center center fixed;
-            background-size: cover;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #040404, #282828);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #f5f6f6;
+      padding: 20px;
+    }
 
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(4, 4, 4, 0.55);
-            z-index: 0;
-        }
+    .container {
+      background: #343434;
+      padding: 35px 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
 
-        .container {
-            position: relative;
-            z-index: 1;
-            background: rgba(255, 255, 255, 0.92);
-            padding: 30px 25px;
-            border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-        }
+    .container:hover {
+      transform: scale(1.01);
+    }
 
-        .logo {
-            width: 100px;
-            max-width: 40%;
-            margin-bottom: 15px;
-        }
+    .logo {
+      width: 90px;
+      max-width: 40%;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));
+      border-radius: 10px !important;
+    }
 
-        h3 {
-            margin: 10px 0 20px;
-            color: #2c1b18;
-            font-size: clamp(20px, 5vw, 26px);
-        }
+    h3 {
+      margin-bottom: 20px;
+      color: #f5f6f6;
+      font-size: clamp(20px, 5vw, 26px);
+      font-weight: 600;
+    }
 
-        input {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: 1px solid #aaa6a6;
-            border-radius: 10px;
-            background: #f9f9f9;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border: 1px solid #565656;
+      border-radius: 10px;
+      background: #282828;
+      color: #f5f6f6;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
 
-        input:focus {
-            border-color: #f1693c;
-            box-shadow: 0 0 6px rgba(241, 105, 60, 0.5);
-        }
+    input::placeholder {
+      color: #8c8c8c;
+    }
 
-        button {
-            width: 100%;
-            padding: 14px;
-            margin-top: 12px;
-            border: none;
-            border-radius: 10px;
-            background: #f1693c;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+    input:focus {
+      border-color: #8c8c8c;
+      box-shadow: 0 0 6px rgba(140, 140, 140, 0.4);
+    }
 
-        button:hover {
-            background: #d8572b;
-        }
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 10px;
+      background: #565656;
+      color: #f5f6f6;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
 
-        .link {
-            margin-top: 18px;
-            font-size: 14px;
-            color: #3c3c3c;
-        }
+    button:hover {
+      background: #747474;
+    }
 
-        .link a {
-            color: #f1693c;
-            font-weight: bold;
-            text-decoration: none;
-        }
+    .link {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #8c8c8c;
+    }
 
-        .erro {
-            background: #ffe0e0;
-            color: #a33;
-            border: 1px solid #f99;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
+    .link a {
+      color: #f5f6f6;
+      font-weight: bold;
+      text-decoration: none;
+      transition: 0.3s;
+    }
 
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px 15px;
-            }
+    .link a:hover {
+      color: #8c8c8c;
+    }
 
-            .logo {
-                width: 80px;
-            }
-        }
-    </style>
+    .erro {
+      background: rgba(255, 0, 0, 0.1);
+      color: #ff6b6b;
+      border: 1px solid #ff6b6b;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 14px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 25px 15px;
+      }
+      .logo {
+        width: 80px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <div class="overlay"></div>
+  <div class="container">
+    <img src="/pwa/assets/logo512px_new.png" alt="Logo" class="logo">
+    <h3>Login</h3>
 
-    <div class="container">
-        <img src="/pwa/assets/logo512px_transparente.png" style="margin-bottom: -8px;" alt="Logo" class="logo">
+    <?php if (isset($erro)): ?>
+      <div class="erro"><?= htmlspecialchars($erro) ?></div>
+    <?php endif; ?>
 
-        <h3>Login</h3>
+    <form method="POST" action="/pwa/login">
+      <input type="text" name="cpf" id="cpf" placeholder="CPF (000.000.000-00)" maxlength="14" required>
+      <input type="password" name="senha" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+    </form>
 
-        <?php if (isset($erro)): ?>
-            <div class="erro"><?= htmlspecialchars($erro) ?></div>
-        <?php endif; ?>
+    <p class="link">Ainda não tem conta? <a href="/pwa/cadastro">Cadastre-se</a></p>
+  </div>
 
-        <form method="POST" action="/pwa/login">
-            <input type="text" name="cpf" id="cpf" placeholder="CPF (000.000.000-00)" maxlength="14" required>
-            <input type="password" name="senha" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
-        </form>
+  <script>
+    const cpfInput = document.getElementById('cpf');
 
-        <p class="link">Ainda não tem conta? <a href="/pwa/cadastro">Cadastre-se</a></p>
-    </div>
+    cpfInput.addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 11) value = value.slice(0, 11);
 
-    <script>
-        const cpfInput = document.getElementById('cpf');
+      if (value.length > 9) {
+        value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+      } else if (value.length > 6) {
+        value = value.replace(/^(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+      } else if (value.length > 3) {
+        value = value.replace(/^(\d{3})(\d{0,3})/, '$1.$2');
+      }
 
-        cpfInput.addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, ''); // remove tudo que não for número
-
-            if (value.length > 11) value = value.slice(0, 11);
-
-            if (value.length > 9) {
-                value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
-            } else if (value.length > 6) {
-                value = value.replace(/^(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
-            } else if (value.length > 3) {
-                value = value.replace(/^(\d{3})(\d{0,3})/, '$1.$2');
-            }
-
-            e.target.value = value;
-        });
-    </script>
+      e.target.value = value;
+    });
+  </script>
 </body>
 </html>
