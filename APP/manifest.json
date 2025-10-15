@@ -7,12 +7,12 @@
   "theme_color": "#f1693c",
   "icons": [
     {
-      "src": "/pwa/assets/logo_s-name192_trasn.png",
+      "src": "/pwa/assets/logo512px_new.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/pwa/assets/logo_sem_nome512px.png",
+      "src": "/pwa/assets/logo512px_new.png",
       "sizes": "512x512",
       "type": "image/png"
     }

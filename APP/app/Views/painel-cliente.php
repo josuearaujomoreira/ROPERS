@@ -1,11 +1,7 @@
 <?php
-// painel-cliente.php
 session_start();
-
-// Exemplo: pega o nome do laçador logado (você pode ajustar depois)
 $nome = $_SESSION['nome'] ?? 'Laçador';
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -15,6 +11,20 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
   <title>Painel do Laçador</title>
   <link rel="manifest" href="/pwa/manifest.json">
   <style>
+    :root {
+      --bg-light: #f5f6f6;
+      --gray1: #8c8c8c;
+      --gray2: #848484;
+      --gray3: #7c7c7c;
+      --gray4: #747474;
+      --gray5: #565656;
+      --gray6: #3a3c3c;
+      --gray7: #343434;
+      --gray8: #282828;
+      --black: #040404;
+      --accent: #565656;
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -23,32 +33,46 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f8f8f8;
+      background: var(--bg-light);
+      color: var(--gray8);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
     }
 
+    /* NAVBAR */
     header {
-      background: linear-gradient(135deg, #f1693c, #d35400);
+      background: var(--gray7);
       color: #fff;
-      padding: 15px 20px;
+      padding: 12px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 20;
+    }
+
+    .navbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .navbar-left img {
+      height: 38px;
+      border-radius: 8px;
     }
 
     header h1 {
-      font-size: 20px;
+      font-size: 18px;
+      font-weight: 500;
     }
 
     .profile-btn {
-      background: rgba(255, 255, 255, 0.15);
+      background: var(--gray6);
       border: none;
       color: white;
       padding: 8px 12px;
@@ -58,12 +82,24 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
     }
 
     .profile-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background: var(--gray5);
     }
 
+    /* CONTEÚDO PRINCIPAL */
     main {
       flex: 1;
       padding: 20px;
+    }
+
+    main h2 {
+      color: var(--gray7);
+      margin-bottom: 10px;
+    }
+
+    /* CARROSSEL */
+    .carousel-container {
+      position: relative;
+      padding: 10px 0;
     }
 
     .carousel {
@@ -72,6 +108,8 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
       gap: 15px;
       scroll-snap-type: x mandatory;
       scrollbar-width: none;
+      scroll-behavior: smooth;
+      padding: 0 10px;
     }
 
     .carousel::-webkit-scrollbar {
@@ -80,9 +118,9 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
 
     .event-card {
       flex: 0 0 85%;
-      background: white;
+      background: #fff;
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       overflow: hidden;
       scroll-snap-align: start;
       transition: transform 0.3s;
@@ -105,20 +143,20 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
 
     .event-info h3 {
       font-size: 18px;
-      color: #333;
+      color: var(--gray7);
       margin-bottom: 5px;
     }
 
     .event-info p {
       font-size: 14px;
-      color: #666;
+      color: var(--gray3);
     }
 
     .event-info button {
       margin-top: 10px;
       width: 100%;
       padding: 10px;
-      background: #f1693c;
+      background: var(--gray7);
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -128,9 +166,49 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
     }
 
     .event-info button:hover {
-      background: #d35400;
+      background: var(--gray6);
     }
 
+    /* BOTÕES DO CARROSSEL */
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(52, 52, 52, 0.9);
+      color: #fff;
+      border: none;
+      font-size: 24px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: opacity 0.3s;
+      display: none;
+      z-index: 15;
+    }
+
+    .carousel-btn:hover {
+      opacity: 1;
+      background: rgba(52, 52, 52, 1);
+    }
+
+    .carousel-btn.prev {
+      left: 10px;
+    }
+
+    .carousel-btn.next {
+      right: 10px;
+    }
+
+    @media (min-width: 768px) {
+      .carousel-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    /* FOOTER */
     footer {
       background: #fff;
       border-top: 1px solid #ddd;
@@ -146,7 +224,7 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
     footer button {
       background: none;
       border: none;
-      color: #666;
+      color: var(--gray4);
       font-size: 14px;
       cursor: pointer;
       display: flex;
@@ -157,7 +235,7 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
 
     footer button.active,
     footer button:hover {
-      color: #f1693c;
+      color: var(--gray7);
     }
 
     footer i {
@@ -165,7 +243,7 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
       margin-bottom: 4px;
     }
 
-    /* Modal Editar Dados */
+    /* MODAL PERFIL */
     .modal {
       display: none;
       position: fixed;
@@ -189,7 +267,7 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
 
     .modal-content h2 {
       margin-bottom: 10px;
-      color: #333;
+      color: var(--gray7);
     }
 
     .modal-content input {
@@ -204,7 +282,7 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
       width: 100%;
       padding: 12px;
       margin-top: 10px;
-      background: #f1693c;
+      background: var(--gray7);
       color: white;
       border: none;
       border-radius: 8px;
@@ -237,34 +315,39 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
 </head>
 
 <body>
-
   <header>
-    <h1>Bem-vindo, <?= htmlspecialchars($nome) ?> 👋</h1>
+    <div class="navbar-left">
+      <img src="/pwa/assets/logo512px_new.png" alt="Logo">
+      <h1>Bem-vindo, <?= htmlspecialchars($nome) ?> 👋</h1>
+    </div>
     <button class="profile-btn" onclick="abrirModal()">Editar Perfil</button>
   </header>
 
   <main>
-    <h2 style="margin-bottom: 10px;">🎯 Eventos Disponíveis</h2>
+    <h2>🎯 Eventos Disponíveis</h2>
 
-    <div class="carousel" id="eventCarousel">
-      <!-- Exemplo de evento -->
-      <div class="event-card">
-        <img src="https://cavalus.com.br/wp-content/uploads/2018/06/LacoPe-Kito-01.jpg" alt="Evento 1">
-        <div class="event-info">
-          <h3>Laço do Sertão</h3>
-          <p>Data: 15/10/2025 - Local: Fazenda Boa Vista</p>
-          <button>Inscrever-se</button>
+    <div class="carousel-container">
+      <button class="carousel-btn prev" onclick="scrollCarousel(-1)">⟵</button>
+      <div class="carousel" id="eventCarousel">
+        <div class="event-card">
+          <img src="https://cavalus.com.br/wp-content/uploads/2018/06/LacoPe-Kito-01.jpg" alt="Evento 1">
+          <div class="event-info">
+            <h3>Laço do Sertão</h3>
+            <p>Data: 15/10/2025 - Local: Fazenda Boa Vista</p>
+            <button>Inscrever-se</button>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <img src="https://i.ytimg.com/vi/R5W0U-2gDxU/maxresdefault.jpg" alt="Evento 2">
+          <div class="event-info">
+            <h3>Desafio dos Campeões</h3>
+            <p>Data: 20/10/2025 - Local: Haras Estrela Dourada</p>
+            <button>Inscrever-se</button>
+          </div>
         </div>
       </div>
-
-      <div class="event-card">
-        <img src="https://i.ytimg.com/vi/R5W0U-2gDxU/maxresdefault.jpg" alt="Evento 2">
-        <div class="event-info">
-          <h3>Desafio dos Campeões</h3>
-          <p>Data: 20/10/2025 - Local: Haras Estrela Dourada</p>
-          <button>Inscrever-se</button>
-        </div>
-      </div>
+      <button class="carousel-btn next" onclick="scrollCarousel(1)">⟶</button>
     </div>
   </main>
 
@@ -274,7 +357,7 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
     <button onclick="abrirModal()"><i>👤</i>Perfil</button>
   </footer>
 
-  <!-- Modal Editar Dados -->
+  <!-- MODAL -->
   <div class="modal" id="modalPerfil">
     <div class="modal-content">
       <h2>Editar Perfil</h2>
@@ -288,6 +371,7 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
 
   <script>
     const modal = document.getElementById('modalPerfil');
+    const carousel = document.getElementById('eventCarousel');
 
     function abrirModal() {
       modal.style.display = 'flex';
@@ -297,11 +381,17 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
       modal.style.display = 'none';
     }
 
-    // Fecha modal clicando fora
     window.onclick = (e) => {
       if (e.target === modal) fecharModal();
     };
-  </script>
 
+    function scrollCarousel(direction) {
+      const scrollAmount = carousel.clientWidth * 0.8;
+      carousel.scrollBy({
+        left: scrollAmount * direction,
+        behavior: 'smooth'
+      });
+    }
+  </script>
 </body>
 </html>
