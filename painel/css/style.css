@@ -1,0 +1,9 @@
+body { background-color: #f5f6f6; color: #3a3c3c; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+.sidebar { background-color: #343434; min-height: 100vh; color: #f5f6f6; }
+.sidebar a { color: #f5f6f6; text-decoration: none; display: block; padding: 10px 20px; margin: 5px 0; border-radius: 5px; transition: 0.2s; }
+.sidebar a:hover { background-color: #565656; }
+.header { background-color: #282828; color: #f5f6f6; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+.card { border-radius: 10px; border: none; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+.btn-primary { background-color: #565656; border-color: #565656; }
+.btn-primary:hover { background-color: #3a3c3c; border-color: #3a3c3c; }
+table th { background-color: #565656; color: #f5f6f6; }
