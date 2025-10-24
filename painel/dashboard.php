@@ -1,6 +1,19 @@
 <?php
 require 'inc/session.php';
 checkLogin();
+require 'inc/config.php';
+
+//Eventos contagem
+$stmt = $pdo->prepare("SELECT * FROM eventos ORDER BY id DESC");
+$stmt->execute();
+$eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$qtd_eventos = count($eventos);
+
+//Eventos Corredores/laçadores
+$stmt = $pdo->prepare("SELECT * FROM `corredores` ORDER BY id DESC");
+$stmt->execute();
+$corredores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$qtd_corredores = count($corredores);
 ?>
 
 <!DOCTYPE html>
@@ -16,6 +29,8 @@ checkLogin();
     <style>
         body {
             background-color: #f5f6f6;
+            position: relative;
+            min-height: 100vh;
         }
 
         .sidebar {
@@ -57,7 +72,6 @@ checkLogin();
             margin-right: 10px;
         }
 
-        /* Quando sidebar está colapsada, esconder o texto */
         .sidebar.collapsed a span {
             display: none;
         }
@@ -71,11 +85,52 @@ checkLogin();
             flex-grow: 1;
             padding: 20px;
             transition: margin-left 0.3s;
+            position: relative;
+            z-index: 1;
+            /* garante que o conteúdo fique acima do fundo */
         }
 
         .toggle-btn {
             cursor: pointer;
             margin-bottom: 20px;
+        }
+
+        /* BLOCO DE FUNDO REUTILIZÁVEL */
+        .background-image {
+            position: absolute;
+
+            /* 1. Correção: Remover aspas e usar ; */
+            overflow: hidden;
+
+            top: 350px;
+
+            /* 2. Otimização: Não precisa de 'height: 100%' nem 'bottom: 0px' se já usa 'top' e 'position: absolute' */
+            /* Se a intenção é que ocupe todo o restante da altura visível: */
+            /* top: 150px; bottom: 0; */
+
+            bottom: 0px;
+            /* Mantido para garantir que ocupe o restante da altura até a base */
+            left: 220px;
+
+            /* ajusta conforme a largura da sidebar */
+            width: calc(100% - 220px);
+
+            /* height: 100%; (Removido, pois 'bottom: 0px' e 'top: 150px' já definem a altura) */
+
+            background-image: url('img/1.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            /* transparência */
+            z-index: 0;
+            pointer-events: none;
+            /* evita interferir em cliques */
+            transition: left 0.3s, width 0.3s;
+        }
+
+        .sidebar.collapsed~.background-image {
+            left: 70px;
+            width: calc(100% - 70px);
         }
     </style>
 </head>
@@ -93,14 +148,22 @@ checkLogin();
             <a href="logout.php"><i class="bi bi-box-arrow-right"></i> <span>Sair</span></a>
         </div>
 
+        <!-- BLOCO DE FUNDO -->
+        <div class="background-image" id="backgroundImage"></div>
+
         <div class="content">
             <button class="btn btn-dark toggle-btn" id="toggleSidebar">
                 <i class="bi bi-list"></i>
             </button>
 
-            <div class="card p-3 mb-3">
-                <h4>Bem-vindo, <?= $_SESSION['nome'] ?></h4>
-                <p>Resumo rápido do painel.</p>
+            <div class="card p-3 mb-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h4>Bem-vindo, <?= $_SESSION['nome'] ?></h4>
+                    <p>Resumo rápido do painel.</p>
+                </div>
+                <button class="btn btn-primary">
+                    <i class="bi bi-download"></i> Exportar Dados
+                </button>
             </div>
 
             <div class="row">
@@ -108,14 +171,14 @@ checkLogin();
                     <div class="card p-3 text-center">
                         <i class="bi bi-calendar-event-fill fs-2"></i>
                         <h5 class="mt-2">Total de Eventos</h5>
-                        <p>0</p>
+                        <p><?= $qtd_eventos; ?></p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="card p-3 text-center">
                         <i class="bi bi-people-fill fs-2"></i>
                         <h5 class="mt-2">Total de Corredores</h5>
-                        <p>0</p>
+                        <p><?= $qtd_corredores; ?></p>
                     </div>
                 </div>
             </div>
@@ -127,15 +190,16 @@ checkLogin();
         const toggleBtn = document.getElementById('toggleSidebar');
         const sidebar = document.getElementById('sidebar');
         const logoImg = document.getElementById('logoImg');
+        const background = document.getElementById('backgroundImage');
 
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
 
             // Troca a imagem do logo conforme o estado da sidebar
             if (sidebar.classList.contains('collapsed')) {
-                logoImg.src = 'img/logofavicon.png'; // sidebar fechada
+                logoImg.src = 'img/logofavicon.png';
             } else {
-                logoImg.src = 'img/3.png'; // sidebar aberta
+                logoImg.src = 'img/3.png';
             }
         });
     </script>
