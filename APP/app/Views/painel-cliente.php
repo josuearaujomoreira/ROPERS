@@ -1,6 +1,13 @@
 <?php
+require __DIR__ . '/../Config/database.php';
 session_start();
+if (!isset($_SESSION['nome'])) {
+  header("Location: /pwa/login");
+
+  exit();
+}
 $nome = $_SESSION['nome'] ?? 'Laçador';
+$id_cliente = $_SESSION['usuario_id'];
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -329,23 +336,55 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
     <div class="carousel-container">
       <button class="carousel-btn prev" onclick="scrollCarousel(-1)">⟵</button>
       <div class="carousel" id="eventCarousel">
-        <div class="event-card">
-          <img src="https://cavalus.com.br/wp-content/uploads/2018/06/LacoPe-Kito-01.jpg" alt="Evento 1">
-          <div class="event-info">
-            <h3>Laço do Sertão</h3>
-            <p>Data: 15/10/2025 - Local: Fazenda Boa Vista</p>
-            <button>Inscrever-se</button>
-          </div>
-        </div>
+        <?php
+        // CÓDIGO FINAL AJUSTADO PARA O PDO E SUAS COLUNAS
 
-        <div class="event-card">
-          <img src="https://i.ytimg.com/vi/R5W0U-2gDxU/maxresdefault.jpg" alt="Evento 2">
-          <div class="event-info">
-            <h3>Desafio dos Campeões</h3>
-            <p>Data: 20/10/2025 - Local: Haras Estrela Dourada</p>
-            <button>Inscrever-se</button>
+        // Certifique-se de que a variável $pdo está disponível e é a sua conexão PDO ativa.
+
+        // 1. Defina a consulta SQL
+        $sql = "SELECT id, nome, data, local, imagem FROM `eventos` WHERE status = 'Ativo'";
+
+        // 2. Prepare e execute
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+
+        // 3. Inicie o loop para percorrer os resultados
+        while ($evento = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+          // --- LÓGICA DE FORMATAÇÃO DE DADOS ---
+
+          // Formatação da Data (Opcional, mas recomendado)
+          $data_formatada = 'N/D';
+          if (isset($evento['data']) && $evento['data']) {
+            try {
+              // Converte 'YYYY-MM-DD' para 'DD/MM/YYYY'
+              $data_objeto = new DateTime($evento['data']);
+              $data_formatada = $data_objeto->format('d/m/Y');
+            } catch (Exception $e) {
+              $data_formatada = 'Data Inválida';
+            }
+          }
+        ?>
+
+          <div class="event-card">
+            <img src="<?php echo htmlspecialchars($evento['imagem']); ?>" alt="<?php echo htmlspecialchars($evento['nome']); ?>">
+
+            <div class="event-info">
+              <h3><?php echo htmlspecialchars($evento['nome']); ?></h3>
+
+              <p>Data: <?php echo $data_formatada; ?> - Local: <?php echo htmlspecialchars($evento['local'] ?? 'N/D'); ?></p>
+
+              <a href="inscricao.php?id=<?php echo htmlspecialchars($evento['id']); ?>">
+                <button>Inscrever-se</button>
+              </a>
+            </div>
           </div>
-        </div>
+
+        <?php
+        } // Fim do loop 'while'
+
+        $stmt->closeCursor(); // Liberar recursos
+        ?>
       </div>
       <button class="carousel-btn next" onclick="scrollCarousel(1)">⟶</button>
     </div>
@@ -394,4 +433,5 @@ $nome = $_SESSION['nome'] ?? 'Laçador';
     }
   </script>
 </body>
+
 </html>

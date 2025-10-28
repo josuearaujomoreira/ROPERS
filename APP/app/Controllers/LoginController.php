@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($usuario && $usuario['senha'] === $senha) {
             // Cria sessão
             $_SESSION['usuario_id'] = $usuario['id'];
-            $_SESSION['usuario_nome'] = $usuario['nome'];
+            $_SESSION['nome'] = $usuario['nome'];
 
             // Redireciona para o painel
             header('Location: /pwa/painel-cliente');
