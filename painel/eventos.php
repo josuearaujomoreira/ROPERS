@@ -23,9 +23,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nome'])) {
         move_uploaded_file($_FILES['imagem']['tmp_name'], $pasta . $novo_nome);
         $imagem = $novo_nome;
     }
+    
+      // Upload da FILE
+    if (!empty($_FILES['Arquivo']['name'])) {
+        $ext = pathinfo($_FILES['Arquivo']['name'], PATHINFO_EXTENSION);
+        $novo_nome = uniqid() . '.' . $ext;
+        $pasta = 'uploads/';
+        if (!is_dir($pasta)) mkdir($pasta, 0777, true);
+        move_uploaded_file($_FILES['Arquivo']['tmp_name'], $pasta . $novo_nome);
+        $file = $novo_nome;
+    }
 
-    $stmt = $pdo->prepare("INSERT INTO eventos (nome, data, local, imagem,status) VALUES (?, ?, ?, ?,?)");
-    $stmt->execute([$nome, $data_evento, $local, $imagem, $status]);
+
+    $stmt = $pdo->prepare("INSERT INTO eventos (nome, data, local, imagem,status,file) VALUES (?, ?, ?, ?,?,?)");
+    $stmt->execute([$nome, $data_evento, $local, $imagem, $status,$file]);
     header("Location: eventos.php");
     exit;
 }
@@ -163,6 +174,11 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <option value="Ativo">Ativo</option>
                                     <option value="Desativado">Desativado</option>
                                 </select>
+                            </div>
+                            
+                              <div class="col-md-3 mb-3">
+                                <label class="form-label">PDF regulamento (Opcional)</label>
+                                    <input type="file" name="Arquivo" class="form-control" >
                             </div>
                             <div class="col-md-5 mb-3">
                                 <label class="form-label">Local</label>

@@ -3,7 +3,6 @@ require __DIR__ . '/../Config/database.php';
 session_start();
 if (!isset($_SESSION['nome'])) {
   header("Location: /pwa/login");
-
   exit();
 }
 $nome = $_SESSION['nome'] ?? 'Laçador';
@@ -48,7 +47,6 @@ $id_cliente = $_SESSION['usuario_id'];
       overflow-x: hidden;
     }
 
-    /* NAVBAR */
     header {
       background: var(--gray7);
       color: #fff;
@@ -92,7 +90,6 @@ $id_cliente = $_SESSION['usuario_id'];
       background: var(--gray5);
     }
 
-    /* CONTEÚDO PRINCIPAL */
     main {
       flex: 1;
       padding: 20px;
@@ -103,7 +100,6 @@ $id_cliente = $_SESSION['usuario_id'];
       margin-bottom: 10px;
     }
 
-    /* CARROSSEL */
     .carousel-container {
       position: relative;
       padding: 10px 0;
@@ -132,6 +128,8 @@ $id_cliente = $_SESSION['usuario_id'];
       scroll-snap-align: start;
       transition: transform 0.3s;
       position: relative;
+      max-width: 400px;
+      margin: 0 auto;
     }
 
     .event-card:hover {
@@ -142,6 +140,12 @@ $id_cliente = $_SESSION['usuario_id'];
       width: 100%;
       height: 180px;
       object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .event-card img:hover {
+      transform: scale(1.02);
     }
 
     .event-info {
@@ -176,7 +180,6 @@ $id_cliente = $_SESSION['usuario_id'];
       background: var(--gray6);
     }
 
-    /* BOTÕES DO CARROSSEL */
     .carousel-btn {
       position: absolute;
       top: 50%;
@@ -215,7 +218,6 @@ $id_cliente = $_SESSION['usuario_id'];
       }
     }
 
-    /* FOOTER */
     footer {
       background: #fff;
       border-top: 1px solid #ddd;
@@ -272,29 +274,51 @@ $id_cliente = $_SESSION['usuario_id'];
       animation: slideUp 0.3s;
     }
 
-    .modal-content h2 {
-      margin-bottom: 10px;
-      color: var(--gray7);
+    /* MODAL DE IMAGEM FULLSCREEN */
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
     }
 
-    .modal-content input {
-      width: 100%;
-      padding: 10px;
-      margin: 6px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+    .image-modal img {
+      max-width: 95%;
+      max-height: 85%;
+      border-radius: 10px;
+      animation: zoomIn 0.3s ease;
     }
 
-    .modal-content button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      background: var(--gray7);
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      font-size: 35px;
       color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
       cursor: pointer;
+      font-weight: bold;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 50%;
+      padding: 5px 15px;
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
 
     @keyframes fadeIn {
@@ -337,54 +361,43 @@ $id_cliente = $_SESSION['usuario_id'];
       <button class="carousel-btn prev" onclick="scrollCarousel(-1)">⟵</button>
       <div class="carousel" id="eventCarousel">
         <?php
-        // CÓDIGO FINAL AJUSTADO PARA O PDO E SUAS COLUNAS
-
-        // Certifique-se de que a variável $pdo está disponível e é a sua conexão PDO ativa.
-
-        // 1. Defina a consulta SQL
-        $sql = "SELECT id, nome, data, local, imagem FROM `eventos` WHERE status = 'Ativo'";
-
-        // 2. Prepare e execute
+        $sql = "SELECT id, nome, data, local, imagem, file FROM `eventos` WHERE status = 'Ativo'";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
 
-        // 3. Inicie o loop para percorrer os resultados
         while ($evento = $stmt->fetch(PDO::FETCH_ASSOC)) {
-
-          // --- LÓGICA DE FORMATAÇÃO DE DADOS ---
-
-          // Formatação da Data (Opcional, mas recomendado)
           $data_formatada = 'N/D';
-          if (isset($evento['data']) && $evento['data']) {
+          if (!empty($evento['data'])) {
             try {
-              // Converte 'YYYY-MM-DD' para 'DD/MM/YYYY'
               $data_objeto = new DateTime($evento['data']);
               $data_formatada = $data_objeto->format('d/m/Y');
             } catch (Exception $e) {
               $data_formatada = 'Data Inválida';
             }
           }
+
+          $imagemPath = '/pwa_painel/uploads/' . htmlspecialchars($evento['imagem']);
+          $filePath = !empty($evento['file']) ? '/pwa_painel/uploads/' . htmlspecialchars($evento['file']) : null;
         ?>
 
           <div class="event-card">
-            <img src="<?php echo htmlspecialchars($evento['imagem']); ?>" alt="<?php echo htmlspecialchars($evento['nome']); ?>">
+            <img src="<?= $imagemPath ?>" alt="<?= htmlspecialchars($evento['nome']) ?>" onclick="openImageModal('<?= $imagemPath ?>')">
 
             <div class="event-info">
-              <h3><?php echo htmlspecialchars($evento['nome']); ?></h3>
+              <h3><?= htmlspecialchars($evento['nome']) ?></h3>
+              <p>Data: <?= $data_formatada ?> - Local: <?= htmlspecialchars($evento['local'] ?? 'N/D') ?></p>
 
-              <p>Data: <?php echo $data_formatada; ?> - Local: <?php echo htmlspecialchars($evento['local'] ?? 'N/D'); ?></p>
+              <?php if ($filePath): ?>
+                <p style="color: blue;">📄 <a href="<?= $filePath ?>" target="_blank" style="color:#343434;text-decoration:none;">Ver Regulamento</a></p>
+              <?php endif; ?>
 
-              <a href="inscricao.php?id=<?php echo htmlspecialchars($evento['id']); ?>">
+              <a href="inscricao.php?id=<?= htmlspecialchars($evento['id']) ?>">
                 <button>Inscrever-se</button>
               </a>
             </div>
           </div>
 
-        <?php
-        } // Fim do loop 'while'
-
-        $stmt->closeCursor(); // Liberar recursos
-        ?>
+        <?php } $stmt->closeCursor(); ?>
       </div>
       <button class="carousel-btn next" onclick="scrollCarousel(1)">⟶</button>
     </div>
@@ -396,7 +409,7 @@ $id_cliente = $_SESSION['usuario_id'];
     <button onclick="abrirModal()"><i>👤</i>Perfil</button>
   </footer>
 
-  <!-- MODAL -->
+  <!-- MODAL PERFIL -->
   <div class="modal" id="modalPerfil">
     <div class="modal-content">
       <h2>Editar Perfil</h2>
@@ -406,6 +419,12 @@ $id_cliente = $_SESSION['usuario_id'];
       <input type="text" placeholder="UF">
       <button onclick="fecharModal()">Salvar Alterações</button>
     </div>
+  </div>
+
+  <!-- MODAL IMAGEM FULLSCREEN -->
+  <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+    <span class="close-btn" onclick="closeImageModal(event)">×</span>
+    <img id="modalImage" src="" alt="Imagem do evento">
   </div>
 
   <script>
@@ -431,7 +450,19 @@ $id_cliente = $_SESSION['usuario_id'];
         behavior: 'smooth'
       });
     }
+
+    // 🖼️ Modal de imagem fullscreen
+    function openImageModal(src) {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImage');
+      modalImg.src = src;
+      modal.style.display = 'flex';
+    }
+
+    function closeImageModal(e) {
+      if (e) e.stopPropagation();
+      document.getElementById('imageModal').style.display = 'none';
+    }
   </script>
 </body>
-
 </html>
