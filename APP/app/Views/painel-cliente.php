@@ -1,10 +1,12 @@
 <?php
 require __DIR__ . '/../Config/database.php';
 session_start();
+
 if (!isset($_SESSION['nome'])) {
   header("Location: /pwa/login");
   exit();
 }
+
 $nome = $_SESSION['nome'] ?? 'Laçador';
 $id_cliente = $_SESSION['usuario_id'];
 ?>
@@ -12,10 +14,11 @@ $id_cliente = $_SESSION['usuario_id'];
 <html lang="pt-br">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel do Laçador</title>
-  <link rel="manifest" href="/pwa/manifest.json">
+  <link rel="manifest" href="/pwa/manifest.json" />
+
   <style>
     :root {
       --bg-light: #f5f6f6;
@@ -197,11 +200,6 @@ $id_cliente = $_SESSION['usuario_id'];
       z-index: 15;
     }
 
-    .carousel-btn:hover {
-      opacity: 1;
-      background: rgba(52, 52, 52, 1);
-    }
-
     .carousel-btn.prev {
       left: 10px;
     }
@@ -274,7 +272,7 @@ $id_cliente = $_SESSION['usuario_id'];
       animation: slideUp 0.3s;
     }
 
-    /* MODAL DE IMAGEM FULLSCREEN */
+    /* MODAL DE IMAGEM */
     .image-modal {
       display: none;
       position: fixed;
@@ -348,7 +346,7 @@ $id_cliente = $_SESSION['usuario_id'];
 <body>
   <header>
     <div class="navbar-left">
-      <img src="/pwa/assets/logo512px_new.png" alt="Logo">
+      <img src="/pwa/assets/logo512px_new.png" alt="Logo" />
       <h1>Bem-vindo, <?= htmlspecialchars($nome) ?> 👋</h1>
     </div>
     <button class="profile-btn" onclick="abrirModal()">Editar Perfil</button>
@@ -361,7 +359,7 @@ $id_cliente = $_SESSION['usuario_id'];
       <button class="carousel-btn prev" onclick="scrollCarousel(-1)">⟵</button>
       <div class="carousel" id="eventCarousel">
         <?php
-        $sql = "SELECT id, nome, data, local, imagem, file FROM `eventos` WHERE status = 'Ativo'";
+        $sql = "SELECT id, nome, data, local, imagem, file FROM eventos WHERE status = 'Ativo'";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
 
@@ -381,7 +379,7 @@ $id_cliente = $_SESSION['usuario_id'];
         ?>
 
           <div class="event-card">
-            <img src="<?= $imagemPath ?>" alt="<?= htmlspecialchars($evento['nome']) ?>" onclick="openImageModal('<?= $imagemPath ?>')">
+            <img src="<?= $imagemPath ?>" alt="<?= htmlspecialchars($evento['nome']) ?>" onclick="openImageModal('<?= $imagemPath ?>')" />
 
             <div class="event-info">
               <h3><?= htmlspecialchars($evento['nome']) ?></h3>
@@ -396,7 +394,6 @@ $id_cliente = $_SESSION['usuario_id'];
               </a>
             </div>
           </div>
-
         <?php } $stmt->closeCursor(); ?>
       </div>
       <button class="carousel-btn next" onclick="scrollCarousel(1)">⟶</button>
@@ -413,26 +410,40 @@ $id_cliente = $_SESSION['usuario_id'];
   <div class="modal" id="modalPerfil">
     <div class="modal-content">
       <h2>Editar Perfil</h2>
-      <input type="text" placeholder="Nome completo">
-      <input type="text" placeholder="WhatsApp">
-      <input type="text" placeholder="Cidade">
-      <input type="text" placeholder="UF">
-      <button onclick="fecharModal()">Salvar Alterações</button>
+      <form id="formPerfil">
+        <input type="text" name="nome" id="nome" placeholder="Nome completo" required />
+        <input type="text" name="whatsapp" id="whatsapp" placeholder="WhatsApp" required />
+        <input type="text" name="cidade" id="cidade" placeholder="Cidade" required />
+        <input type="text" name="uf" id="uf" placeholder="UF" maxlength="2" required />
+        <button type="submit">Salvar Alterações</button>
+      </form>
     </div>
   </div>
 
-  <!-- MODAL IMAGEM FULLSCREEN -->
+  <!-- MODAL DE IMAGEM -->
   <div id="imageModal" class="image-modal" onclick="closeImageModal()">
     <span class="close-btn" onclick="closeImageModal(event)">×</span>
-    <img id="modalImage" src="" alt="Imagem do evento">
+    <img id="modalImage" src="" alt="Imagem do evento" />
   </div>
 
   <script>
     const modal = document.getElementById('modalPerfil');
+    const formPerfil = document.getElementById('formPerfil');
     const carousel = document.getElementById('eventCarousel');
 
     function abrirModal() {
       modal.style.display = 'flex';
+      // Buscar dados atuais
+      fetch('/pwa/getPerfil.php')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            nome.value = data.perfil.nome || '';
+            whatsapp.value = data.perfil.whatsapp || '';
+            cidade.value = data.perfil.cidade || '';
+            uf.value = data.perfil.uf || '';
+          }
+        });
     }
 
     function fecharModal() {
@@ -445,18 +456,33 @@ $id_cliente = $_SESSION['usuario_id'];
 
     function scrollCarousel(direction) {
       const scrollAmount = carousel.clientWidth * 0.8;
-      carousel.scrollBy({
-        left: scrollAmount * direction,
-        behavior: 'smooth'
-      });
+      carousel.scrollBy({ left: scrollAmount * direction, behavior: 'smooth' });
     }
 
-    // 🖼️ Modal de imagem fullscreen
+    formPerfil.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(formPerfil);
+
+      const response = await fetch('/pwa/editarPerfil.php', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+      alert(result.message);
+
+      if (result.success) {
+        fecharModal();
+        location.reload();
+      }
+    });
+
+    // Modal imagem fullscreen
     function openImageModal(src) {
-      const modal = document.getElementById('imageModal');
+      const imageModal = document.getElementById('imageModal');
       const modalImg = document.getElementById('modalImage');
       modalImg.src = src;
-      modal.style.display = 'flex';
+      imageModal.style.display = 'flex';
     }
 
     function closeImageModal(e) {
@@ -465,4 +491,5 @@ $id_cliente = $_SESSION['usuario_id'];
     }
   </script>
 </body>
+
 </html>
