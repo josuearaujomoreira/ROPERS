@@ -1,3 +1,11 @@
+<?php
+header('Content-Type: text/html; charset=UTF-8');
+
+  
+unset($_SESSION['nome']);
+unset($_SESSION['usuario_id']);
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -152,7 +160,7 @@
       <button type="submit">Entrar</button>
     </form>
 
-    <p class="link">Ainda não tem conta? <a href="/pwa/cadastro">Cadastre-se</a></p>
+    <p class="link">Ainda ta sem conta? <a href="/pwa/cadastro">Cadastre-se</a></p>
   </div>
 
   <script>

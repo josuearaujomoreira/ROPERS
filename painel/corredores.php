@@ -193,7 +193,7 @@ $corredores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <th>Nome</th>
                                 <th>Apelido</th>
                                 <th>Cidade</th>
-                                <th>UF</th>
+                                <th>UF</th> 
                                 <th>Ações</th>
                             </tr>
                         </thead>

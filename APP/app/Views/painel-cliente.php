@@ -1,24 +1,33 @@
 <?php
 require __DIR__ . '/../Config/database.php';
 session_start();
-
 if (!isset($_SESSION['nome'])) {
   header("Location: /pwa/login");
   exit();
 }
-
 $nome = $_SESSION['nome'] ?? 'Laçador';
 $id_cliente = $_SESSION['usuario_id'];
+
+$dados_lancadores = "SELECT * FROM `lacadores` where `id` = '$id_cliente'";
+
+$stmt = $pdo->prepare("SELECT * FROM lacadores WHERE id = ?");
+$stmt->execute([$id_cliente]);
+
+$lacador = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel do Laçador</title>
-  <link rel="manifest" href="/pwa/manifest.json" />
+  <link rel="manifest" href="/pwa/manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
   <style>
     :root {
       --bg-light: #f5f6f6;
@@ -200,6 +209,11 @@ $id_cliente = $_SESSION['usuario_id'];
       z-index: 15;
     }
 
+    .carousel-btn:hover {
+      opacity: 1;
+      background: rgba(52, 52, 52, 1);
+    }
+
     .carousel-btn.prev {
       left: 10px;
     }
@@ -272,7 +286,7 @@ $id_cliente = $_SESSION['usuario_id'];
       animation: slideUp 0.3s;
     }
 
-    /* MODAL DE IMAGEM */
+    /* MODAL DE IMAGEM FULLSCREEN */
     .image-modal {
       display: none;
       position: fixed;
@@ -346,7 +360,7 @@ $id_cliente = $_SESSION['usuario_id'];
 <body>
   <header>
     <div class="navbar-left">
-      <img src="/pwa/assets/logo512px_new.png" alt="Logo" />
+      <img src="/pwa/assets/logo512px_new.png" alt="Logo">
       <h1>Bem-vindo, <?= htmlspecialchars($nome) ?> 👋</h1>
     </div>
     <button class="profile-btn" onclick="abrirModal()">Editar Perfil</button>
@@ -359,7 +373,7 @@ $id_cliente = $_SESSION['usuario_id'];
       <button class="carousel-btn prev" onclick="scrollCarousel(-1)">⟵</button>
       <div class="carousel" id="eventCarousel">
         <?php
-        $sql = "SELECT id, nome, data, local, imagem, file FROM eventos WHERE status = 'Ativo'";
+        $sql = "SELECT id, nome, data, local, imagem, file FROM `eventos` WHERE status = 'Ativo'";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
 
@@ -379,7 +393,7 @@ $id_cliente = $_SESSION['usuario_id'];
         ?>
 
           <div class="event-card">
-            <img src="<?= $imagemPath ?>" alt="<?= htmlspecialchars($evento['nome']) ?>" onclick="openImageModal('<?= $imagemPath ?>')" />
+            <img src="<?= $imagemPath ?>" alt="<?= htmlspecialchars($evento['nome']) ?>" onclick="openImageModal('<?= $imagemPath ?>')">
 
             <div class="event-info">
               <h3><?= htmlspecialchars($evento['nome']) ?></h3>
@@ -394,7 +408,9 @@ $id_cliente = $_SESSION['usuario_id'];
               </a>
             </div>
           </div>
-        <?php } $stmt->closeCursor(); ?>
+
+        <?php }
+        $stmt->closeCursor(); ?>
       </div>
       <button class="carousel-btn next" onclick="scrollCarousel(1)">⟶</button>
     </div>
@@ -410,40 +426,75 @@ $id_cliente = $_SESSION['usuario_id'];
   <div class="modal" id="modalPerfil">
     <div class="modal-content">
       <h2>Editar Perfil</h2>
-      <form id="formPerfil">
-        <input type="text" name="nome" id="nome" placeholder="Nome completo" required />
-        <input type="text" name="whatsapp" id="whatsapp" placeholder="WhatsApp" required />
-        <input type="text" name="cidade" id="cidade" placeholder="Cidade" required />
-        <input type="text" name="uf" id="uf" placeholder="UF" maxlength="2" required />
-        <button type="submit">Salvar Alterações</button>
-      </form>
+
+      <input type="hidden" id="id" value="<?= $lacador['id'] ?>">
+
+      <label>Nome completo</label>
+      <input type="text" class="form-control" id="nome"
+        value="<?= $lacador['nome'] ?>">
+
+      <label>WhatsApp</label>
+      <input type="text" class="form-control" id="whatsapp"
+        value="<?= $lacador['whatsapp'] ?>">
+
+      <label>Apelido</label>
+      <input type="text" class="form-control" id="apelido"
+        value="<?= $lacador['apelido'] ?>">
+
+      <label>Handicap Cabeça</label>
+      <input type="text" class="form-control" id="handicap_cabeca"
+        value="<?= $lacador['handicap_cabeca'] ?>">
+
+      <label>Handicap Pé</label>
+      <input type="text" class="form-control" id="handicap_pe"
+        value="<?= $lacador['handicap_pe'] ?>">
+
+      <br>
+
+      <button class="btn btn-sm btn-success" onclick="salvarPerfil()">Salvar Alterações</button>
+      <hr>
+      <a class="btn btn-sm btn-danger" href="/pwa/login">Sair</a>
     </div>
   </div>
 
-  <!-- MODAL DE IMAGEM -->
+
+  <!-- MODAL IMAGEM FULLSCREEN -->
   <div id="imageModal" class="image-modal" onclick="closeImageModal()">
     <span class="close-btn" onclick="closeImageModal(event)">×</span>
-    <img id="modalImage" src="" alt="Imagem do evento" />
+    <img id="modalImage" src="" alt="Imagem do evento">
   </div>
+  <script>
+    function salvarPerfil() {
+      let formData = new FormData();
+
+      formData.append('id', document.getElementById('id').value);
+      formData.append('nome', document.getElementById('nome').value);
+      formData.append('whatsapp', document.getElementById('whatsapp').value);
+      formData.append('apelido', document.getElementById('apelido').value);
+      formData.append('handicap_cabeca', document.getElementById('handicap_cabeca').value);
+      formData.append('handicap_pe', document.getElementById('handicap_pe').value);
+
+      fetch('/pwa/app/Views/atualizar_perfil.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(r => r.text())
+        .then(resp => {
+          alert(resp);
+          fecharModal();
+        });
+    }
+  </script>
+
 
   <script>
     const modal = document.getElementById('modalPerfil');
-    const formPerfil = document.getElementById('formPerfil');
     const carousel = document.getElementById('eventCarousel');
+
+
 
     function abrirModal() {
       modal.style.display = 'flex';
-      // Buscar dados atuais
-      fetch('/pwa/getPerfil.php')
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            nome.value = data.perfil.nome || '';
-            whatsapp.value = data.perfil.whatsapp || '';
-            cidade.value = data.perfil.cidade || '';
-            uf.value = data.perfil.uf || '';
-          }
-        });
     }
 
     function fecharModal() {
@@ -456,33 +507,18 @@ $id_cliente = $_SESSION['usuario_id'];
 
     function scrollCarousel(direction) {
       const scrollAmount = carousel.clientWidth * 0.8;
-      carousel.scrollBy({ left: scrollAmount * direction, behavior: 'smooth' });
+      carousel.scrollBy({
+        left: scrollAmount * direction,
+        behavior: 'smooth'
+      });
     }
 
-    formPerfil.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(formPerfil);
-
-      const response = await fetch('/pwa/editarPerfil.php', {
-        method: 'POST',
-        body: formData
-      });
-
-      const result = await response.json();
-      alert(result.message);
-
-      if (result.success) {
-        fecharModal();
-        location.reload();
-      }
-    });
-
-    // Modal imagem fullscreen
+    // 🖼️ Modal de imagem fullscreen
     function openImageModal(src) {
-      const imageModal = document.getElementById('imageModal');
+      const modal = document.getElementById('imageModal');
       const modalImg = document.getElementById('modalImage');
       modalImg.src = src;
-      imageModal.style.display = 'flex';
+      modal.style.display = 'flex';
     }
 
     function closeImageModal(e) {
