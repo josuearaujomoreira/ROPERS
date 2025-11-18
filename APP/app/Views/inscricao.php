@@ -1,24 +1,35 @@
 <?php
 require __DIR__ . '/../Config/database.php';
 session_start();
+
+// Verificar login
 if (!isset($_SESSION['nome'])) {
   header("Location: /pwa/login");
   exit();
 }
+
 $nome = $_SESSION['nome'] ?? 'Laçador';
 $id_cliente = $_SESSION['usuario_id'];
 
- 
+// Pegar ID do evento
+$id_evento = $_GET['id'] ?? null;
+if (!$id_evento) {
+  echo "Evento não encontrado!";
+  exit;
+}
 
+// Buscar dados do laçador
 $stmt = $pdo->prepare("SELECT * FROM lacadores WHERE id = ?");
-$stmt->execute([$id_cliente]);  
+$stmt->execute([$id_cliente]);
 $lacador = $stmt->fetch(PDO::FETCH_ASSOC);
 
-
-$stmt = $pdo->prepare("SELECT * FROM `eventos` WHERE id = ?");
-$stmt->execute([$id_evento]);  
+// Buscar dados do evento
+$stmt = $pdo->prepare("SELECT * FROM eventos WHERE id = ?");
+$stmt->execute([$id_evento]);
 $evento = $stmt->fetch(PDO::FETCH_ASSOC);
- 
+
+// Caminho da imagem
+$imagemPath = '/pwa_painel/uploads/' . htmlspecialchars($evento['imagem']);
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -26,30 +37,17 @@ $evento = $stmt->fetch(PDO::FETCH_ASSOC);
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel do Laçador</title>
-  <link rel="manifest" href="/pwa/manifest.json">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <title>Inscrição no Evento</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  <link rel="manifest" href="/pwa/manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
     :root {
       --bg-light: #f5f6f6;
-      --gray1: #8c8c8c;
-      --gray2: #848484;
-      --gray3: #7c7c7c;
-      --gray4: #747474;
-      --gray5: #565656;
-      --gray6: #3a3c3c;
       --gray7: #343434;
+      --gray5: #565656;
       --gray8: #282828;
-      --black: #040404;
-      --accent: #565656;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
     }
 
     body {
@@ -59,392 +57,231 @@ $evento = $stmt->fetch(PDO::FETCH_ASSOC);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
     }
 
     header {
       background: var(--gray7);
-      color: #fff;
+      color: white;
       padding: 12px 20px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       position: sticky;
       top: 0;
-      z-index: 20;
+      z-index: 10;
     }
 
-    .navbar-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .navbar-left img {
+    header img {
       height: 38px;
       border-radius: 8px;
-    }
-
-    header h1 {
-      font-size: 18px;
-      font-weight: 500;
-    }
-
-    .profile-btn {
-      background: var(--gray6);
-      border: none;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .profile-btn:hover {
-      background: var(--gray5);
     }
 
     main {
       flex: 1;
       padding: 20px;
+      padding-bottom: 90px;
     }
 
-    main h2 {
-      color: var(--gray7);
-      margin-bottom: 10px;
-    }
-
-    .carousel-container {
-      position: relative;
-      padding: 10px 0;
-    }
-
-    .carousel {
-      display: flex;
-      overflow-x: auto;
-      gap: 15px;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
-      scroll-behavior: smooth;
-      padding: 0 10px;
-    }
-
-    .carousel::-webkit-scrollbar {
-      display: none;
-    }
-
-    .event-card {
-      flex: 0 0 85%;
-      background: #fff;
+    .card-inscricao {
+      background: white;
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
       overflow: hidden;
-      scroll-snap-align: start;
-      transition: transform 0.3s;
-      position: relative;
-      max-width: 400px;
-      margin: 0 auto;
     }
 
-    .event-card:hover {
-      transform: scale(1.03);
-    }
-
-    .event-card img {
+    .card-inscricao img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
+      display: block;
       cursor: pointer;
-      transition: transform 0.3s ease;
+      transition: opacity .2s;
     }
 
-    .event-card img:hover {
-      transform: scale(1.02);
-    }
-
-    .event-info {
-      padding: 15px;
-    }
-
-    .event-info h3 {
-      font-size: 18px;
-      color: var(--gray7);
-      margin-bottom: 5px;
-    }
-
-    .event-info p {
-      font-size: 14px;
-      color: var(--gray3);
-    }
-
-    .event-info button {
-      margin-top: 10px;
-      width: 100%;
-      padding: 10px;
-      background: var(--gray7);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .event-info button:hover {
-      background: var(--gray6);
-    }
-
-    .carousel-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(52, 52, 52, 0.9);
-      color: #fff;
-      border: none;
-      font-size: 24px;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: opacity 0.3s;
-      display: none;
-      z-index: 15;
-    }
-
-    .carousel-btn:hover {
-      opacity: 1;
-      background: rgba(52, 52, 52, 1);
-    }
-
-    .carousel-btn.prev {
-      left: 10px;
-    }
-
-    .carousel-btn.next {
-      right: 10px;
-    }
-
-    @media (min-width: 768px) {
-      .carousel-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
+    .card-inscricao img:hover {
+      opacity: 0.9;
     }
 
     footer {
       background: #fff;
       border-top: 1px solid #ddd;
+      padding: 22px 0;
       display: flex;
       justify-content: space-around;
-      padding: 10px 0;
       position: fixed;
       bottom: 0;
       width: 100%;
       z-index: 10;
     }
 
-    footer button {
+
+
+
+    footer a {
       background: none;
       border: none;
-      color: var(--gray4);
+      color: var(--gray5);
       font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: color 0.3s;
+      text-decoration: none;
+      text-align: center;
+      transition: transform 0.1s ease, opacity 0.1s ease;
+      padding: 8px 12px;
+      border-radius: 8px;
     }
 
-    footer button.active,
-    footer button:hover {
-      color: var(--gray7);
+    /* Efeito ao tocar (mobile friendly) */
+    footer a:active {
+      transform: scale(0.92);
+      opacity: 0.6;
+      background: rgba(0, 0, 0, 0.05);
     }
 
-    footer i {
-      font-size: 20px;
-      margin-bottom: 4px;
-    }
-
-    /* MODAL PERFIL */
-    .modal {
-      display: none;
+    /* MODAL FULLSCREEN */
+    #imgModal {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      animation: fadeIn 0.3s;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-      animation: slideUp 0.3s;
-    }
-
-    /* MODAL DE IMAGEM FULLSCREEN */
-    .image-modal {
+      background: rgba(0, 0, 0, .85);
       display: none;
-      position: fixed;
-      z-index: 9999;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.9);
       justify-content: center;
       align-items: center;
-      animation: fadeIn 0.3s ease;
+      z-index: 99999;
+      padding: 20px;
     }
 
-    .image-modal img {
-      max-width: 95%;
-      max-height: 85%;
-      border-radius: 10px;
-      animation: zoomIn 0.3s ease;
+    #imgModal img {
+      max-width: 100%;
+      max-height: 90vh;
+      border-radius: 8px;
+      object-fit: contain;
     }
 
-    .close-btn {
+    #closeModal {
       position: absolute;
-      top: 20px;
+      top: 25px;
       right: 25px;
-      font-size: 35px;
       color: white;
-      cursor: pointer;
-      font-weight: bold;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, .4);
+      border: none;
+      font-size: 26px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
-      padding: 5px 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    @keyframes zoomIn {
-      from {
-        transform: scale(0.8);
-        opacity: 0;
-      }
-
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
+    #closeModal:hover {
+      background: rgba(0, 0, 0, .7);
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
+    #btnSubmit.loading #btnText {
+      opacity: 0.6;
     }
 
-    @keyframes slideUp {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
+    #btnSubmit.loading {
+      pointer-events: none;
+      cursor: not-allowed;
     }
   </style>
 </head>
 
 <body>
+
   <header>
-    <div class="navbar-left">
-      <img src="/pwa/assets/logo512px_new.png" alt="Logo">
-      <h1>Bem-vindo, <?= htmlspecialchars($nome) ?> 👋</h1>
+    <div class="d-flex align-items-center gap-2">
+      <img src="/pwa/assets/logo512px_new.png">
+      <h1 style="font-size: 18px; margin: 0;">Olá, <?= htmlspecialchars($nome) ?></h1>
     </div>
-    <button class="profile-btn" onclick="abrirModal()">Editar Perfil</button>
   </header>
 
   <main>
-    <h2>🎯Confirmar inscrição para o evento ==> <?=$evento['nome']?></h2>
+    <h2 class="mb-3">🎯 Confirmar Inscrição</h2>
 
-    
+    <div class="card-inscricao">
+
+      <!-- IMAGEM CLICÁVEL -->
+      <img id="openImage" src="<?= $imagemPath ?>" alt="Imagem do evento">
+
+      <div class="p-3">
+        <p><strong>Evento:</strong> <?= htmlspecialchars($evento['nome']) ?></p>
+        <?php
+        $data_formatada = date("d/m/Y", strtotime($evento['data']));
+        ?>
+        <p><strong>Data:</strong> <?= $data_formatada ?></p>
+
+        <p><strong>Local:</strong> <?= htmlspecialchars($evento['local']) ?></p>
+        <p><strong>Valor:</strong>
+          <?= htmlspecialchars($evento['valor']) ?>
+        </p>
+
+        <form method="POST" action="/pwa/app/Views/salvar_inscricao.php">
+          <input type="hidden" name="id_evento" value="<?= $id_evento ?>">
+          <input type="hidden" name="id_lacador" value="<?= $id_cliente ?>">
+
+          <label class="mt-3"><b>Escolher modalidade:</b></label>
+          <select class="form-select mt-1" name="modalidade" required>
+            <option value="">Escolha uma opção</option>
+            <option value="Pé">🔰 Pé</option>
+            <option value="Cabeça">🔰 Cabeça</option>
+            <option value="Ambos">🔰 Ambos</option>
+          </select>
+
+          <button id="btnSubmit" type="submit" class="btn btn-dark w-100 mt-4" style="background: var(--gray7); position: relative;">
+            <span id="btnText">Confirmar Inscrição</span>
+            <div id="spinner" class="spinner-border spinner-border-sm" style="display:none; position:absolute; right:15px; top:50%; transform:translateY(-50%);"></div>
+          </button>
+
+        </form>
+      </div>
+    </div>
+
   </main>
 
   <footer>
-    <button class="active"><i>🏠</i>Início</button>
-    <button> <a href="/pwa/painel-cliente"><i>🗓️</i>Meus Eventos</a></button>
-   
+    <a href="/pwa/painel-cliente">🏠 Início</a>
+    <a href="/pwa/painel-cliente">🗓️ Meus Eventos</a>
   </footer>
 
- 
-  <script>
-    function salvarPerfil() {
-      let formData = new FormData();
-
-      formData.append('id', document.getElementById('id').value);
-      formData.append('nome', document.getElementById('nome').value);
-      formData.append('whatsapp', document.getElementById('whatsapp').value);
-      formData.append('apelido', document.getElementById('apelido').value);
-      formData.append('handicap_cabeca', document.getElementById('handicap_cabeca').value);
-      formData.append('handicap_pe', document.getElementById('handicap_pe').value);
-
-      fetch('/pwa/app/Views/atualizar_perfil.php', {
-          method: 'POST',
-          body: formData
-        })
-        .then(r => r.text())
-        .then(resp => {
-          alert(resp);
-          fecharModal();
-        });
-    }
-  </script>
-
+  <!-- MODAL FULLSCREEN -->
+  <div id="imgModal">
+    <button id="closeModal">&times;</button>
+    <img id="modalImg" src="">
+  </div>
 
   <script>
-    const modal = document.getElementById('modalPerfil');
-    const carousel = document.getElementById('eventCarousel');
+    const openImage = document.getElementById("openImage");
+    const imgModal = document.getElementById("imgModal");
+    const modalImg = document.getElementById("modalImg");
+    const closeModal = document.getElementById("closeModal");
 
-
-
-    function abrirModal() {
-      modal.style.display = 'flex';
-    }
-
-    function fecharModal() {
-      modal.style.display = 'none';
-    }
-
-    window.onclick = (e) => {
-      if (e.target === modal) fecharModal();
+    openImage.onclick = () => {
+      modalImg.src = openImage.src;
+      imgModal.style.display = "flex";
     };
 
-    function scrollCarousel(direction) {
-      const scrollAmount = carousel.clientWidth * 0.8;
-      carousel.scrollBy({
-        left: scrollAmount * direction,
-        behavior: 'smooth'
-      });
-    }
+    closeModal.onclick = () => {
+      imgModal.style.display = "none";
+    };
 
-    // 🖼️ Modal de imagem fullscreen
-    function openImageModal(src) {
-      const modal = document.getElementById('imageModal');
-      const modalImg = document.getElementById('modalImage');
-      modalImg.src = src;
-      modal.style.display = 'flex';
-    }
+    imgModal.onclick = (e) => {
+      if (e.target === imgModal) imgModal.style.display = "none";
+    };
 
-    function closeImageModal(e) {
-      if (e) e.stopPropagation();
-      document.getElementById('imageModal').style.display = 'none';
-    }
+    const form = document.querySelector("form");
+    const btnSubmit = document.getElementById("btnSubmit");
+    const spinner = document.getElementById("spinner");
+    const btnText = document.getElementById("btnText");
+
+    form.addEventListener("submit", () => {
+      btnSubmit.classList.add("loading");
+      spinner.style.display = "inline-block";
+      btnText.textContent = "Enviando...";
+    });
   </script>
+
+
+
 </body>
 
 </html>

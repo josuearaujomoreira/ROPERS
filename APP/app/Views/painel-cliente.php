@@ -418,7 +418,9 @@ $lacador = $stmt->fetch(PDO::FETCH_ASSOC);
 
   <footer>
     <button class="active"><i>🏠</i>Início</button>
-    <button><i>🗓️</i>Meus Eventos</button>
+    <button onclick="window.location='/pwa/meu_evento'">
+      <i>🗓️</i> Meus Eventos
+    </button>
     <button onclick="abrirModal()"><i>👤</i>Perfil</button>
   </footer>
 

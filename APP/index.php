@@ -32,6 +32,9 @@ switch ($request) {
     case 'pwa/inscricao':
         require __DIR__ . '/app/Controllers/InsccricaoController.php';
         break;
+    case 'pwa/meu_evento':
+        require __DIR__ . '/app/Controllers/EventoController.php';
+        break;
 
     default:
         http_response_code(404);
