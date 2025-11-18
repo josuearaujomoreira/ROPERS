@@ -29,9 +29,12 @@ switch ($request) {
     case 'pwa/painel-cliente':
         require __DIR__ . '/app/Controllers/PainelController.php';
         break;
-     
+    case 'pwa/inscricao':
+        require __DIR__ . '/app/Controllers/InsccricaoController.php';
+        break;
+
     default:
         http_response_code(404);
-        echo "2321Página não encontrada!".$request;
+        echo "2321Página não encontrada!" . $request;
         break;
 }

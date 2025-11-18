@@ -8,14 +8,17 @@ if (!isset($_SESSION['nome'])) {
 $nome = $_SESSION['nome'] ?? 'Laçador';
 $id_cliente = $_SESSION['usuario_id'];
 
-$dados_lancadores = "SELECT * FROM `lacadores` where `id` = '$id_cliente'";
+ 
 
 $stmt = $pdo->prepare("SELECT * FROM lacadores WHERE id = ?");
-$stmt->execute([$id_cliente]);
-
+$stmt->execute([$id_cliente]);  
 $lacador = $stmt->fetch(PDO::FETCH_ASSOC);
 
 
+$stmt = $pdo->prepare("SELECT * FROM `eventos` WHERE id = ?");
+$stmt->execute([$id_evento]);  
+$evento = $stmt->fetch(PDO::FETCH_ASSOC);
+ 
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -367,102 +370,18 @@ $lacador = $stmt->fetch(PDO::FETCH_ASSOC);
   </header>
 
   <main>
-    <h2>🎯 Eventos Disponíveis</h2>
+    <h2>🎯Confirmar inscrição para o evento ==> <?=$evento['nome']?></h2>
 
-    <div class="carousel-container">
-      <button class="carousel-btn prev" onclick="scrollCarousel(-1)">⟵</button>
-      <div class="carousel" id="eventCarousel">
-        <?php
-        $sql = "SELECT id, nome, data, local, imagem, file FROM `eventos` WHERE status = 'Ativo'";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute();
-
-        while ($evento = $stmt->fetch(PDO::FETCH_ASSOC)) {
-          $data_formatada = 'N/D';
-          if (!empty($evento['data'])) {
-            try {
-              $data_objeto = new DateTime($evento['data']);
-              $data_formatada = $data_objeto->format('d/m/Y');
-            } catch (Exception $e) {
-              $data_formatada = 'Data Inválida';
-            }
-          }
-
-          $imagemPath = '/pwa_painel/uploads/' . htmlspecialchars($evento['imagem']);
-          $filePath = !empty($evento['file']) ? '/pwa_painel/uploads/' . htmlspecialchars($evento['file']) : null;
-        ?>
-
-          <div class="event-card">
-            <img src="<?= $imagemPath ?>" alt="<?= htmlspecialchars($evento['nome']) ?>" onclick="openImageModal('<?= $imagemPath ?>')">
-
-            <div class="event-info">
-              <h3><?= htmlspecialchars($evento['nome']) ?></h3>
-              <p>Data: <?= $data_formatada ?> - Local: <?= htmlspecialchars($evento['local'] ?? 'N/D') ?></p>
-
-              <?php if ($filePath): ?>
-                <p style="color: blue;">📄 <a href="<?= $filePath ?>" target="_blank" style="color:#343434;text-decoration:none;">Ver Regulamento</a></p>
-              <?php endif; ?>
-              <a href="/pwa/inscricao?id=<?= htmlspecialchars($evento['id']) ?>">
-                <button>Inscrever-se</button>
-              </a>
-
-            </div>
-          </div>
-
-        <?php }
-        $stmt->closeCursor(); ?>
-      </div>
-      <button class="carousel-btn next" onclick="scrollCarousel(1)">⟶</button>
-    </div>
+    
   </main>
 
   <footer>
     <button class="active"><i>🏠</i>Início</button>
-    <button><i>🗓️</i>Meus Eventos</button>
-    <button onclick="abrirModal()"><i>👤</i>Perfil</button>
+    <button> <a href="/pwa/painel-cliente"><i>🗓️</i>Meus Eventos</a></button>
+   
   </footer>
 
-  <!-- MODAL PERFIL -->
-  <div class="modal" id="modalPerfil">
-    <div class="modal-content">
-      <h2>Editar Perfil</h2>
-
-      <input type="hidden" id="id" value="<?= $lacador['id'] ?>">
-
-      <label>Nome completo</label>
-      <input type="text" class="form-control" id="nome"
-        value="<?= $lacador['nome'] ?>">
-
-      <label>WhatsApp</label>
-      <input type="text" class="form-control" id="whatsapp"
-        value="<?= $lacador['whatsapp'] ?>">
-
-      <label>Apelido</label>
-      <input type="text" class="form-control" id="apelido"
-        value="<?= $lacador['apelido'] ?>">
-
-      <label>Handicap Cabeça</label>
-      <input type="text" class="form-control" id="handicap_cabeca"
-        value="<?= $lacador['handicap_cabeca'] ?>">
-
-      <label>Handicap Pé</label>
-      <input type="text" class="form-control" id="handicap_pe"
-        value="<?= $lacador['handicap_pe'] ?>">
-
-      <br>
-
-      <button class="btn btn-sm btn-success" onclick="salvarPerfil()">Salvar Alterações</button>
-      <hr>
-      <a class="btn btn-sm btn-danger" href="/pwa/login">Sair</a>
-    </div>
-  </div>
-
-
-  <!-- MODAL IMAGEM FULLSCREEN -->
-  <div id="imageModal" class="image-modal" onclick="closeImageModal()">
-    <span class="close-btn" onclick="closeImageModal(event)">×</span>
-    <img id="modalImage" src="" alt="Imagem do evento">
-  </div>
+ 
   <script>
     function salvarPerfil() {
       let formData = new FormData();

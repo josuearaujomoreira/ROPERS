@@ -1,6 +1,6 @@
 <?php
 // app/Controllers/LoginController.php
-require __DIR__ . '/../app/Config/database.php';
+require __DIR__ . '/../../app/Config/database.php';
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
