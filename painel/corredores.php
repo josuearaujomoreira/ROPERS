@@ -101,6 +101,21 @@ $corredores = $stmt->fetchAll(PDO::FETCH_ASSOC);
     .sidebar.collapsed a span {
         display: none;
     }
+
+    .badge-pendente {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .badge-aprovado {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .badge-reprovado {
+        background-color: #dc3545;
+        color: #fff;
+    }
 </style>
 
 <body>
@@ -193,7 +208,7 @@ $corredores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <th>Nome</th>
                                 <th>Apelido</th>
                                 <th>Cidade</th>
-                                <th>UF</th> 
+                                <th>UF</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -231,21 +246,33 @@ $corredores = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-    <!-- MODAL EVENTOS -->
+    <!-- MODAL EVENTOS E INSCRIÇÕES -->
     <div class="modal fade" id="modalEventos" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title">Eventos Inscritos</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title">Inscrições do Corredor</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body" id="listaEventos">Carregando...</div>
+                <div class="modal-body" id="listaEventos">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Toggle Sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        });
+
+        // Modal de Eventos
         const modalEventos = document.getElementById('modalEventos');
         modalEventos.addEventListener('show.bs.modal', event => {
             const button = event.relatedTarget;
@@ -255,6 +282,43 @@ $corredores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 .then(res => res.text())
                 .then(html => document.getElementById('listaEventos').innerHTML = html);
         });
+
+        // Função para aprovar/reprovar inscrição
+        function atualizarStatus(inscricaoId, novoStatus) {
+            if (!confirm('Confirma a alteração do status?')) return;
+
+            fetch('atualizar_inscricao.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `inscricao_id=${inscricaoId}&status=${novoStatus}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Inscrição atualizada!")
+
+                        setTimeout(function() {
+                            window.location.href = "";
+                        }, 100);
+
+                        // Recarrega a lista de eventos do corredor
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalEventos'));
+                        const lacadorId = document.querySelector('[data-bs-target="#modalEventos"]').getAttribute('data-id');
+
+                        fetch('listar_eventos_corredor.php?id=' + lacadorId)
+                            .then(res => res.text())
+                            .then(html => document.getElementById('listaEventos').innerHTML = html);
+                    } else {
+                        alert('Erro ao atualizar status: ' + data.message);
+                    }
+                })
+                .catch(err => {
+                    alert('Erro ao processar solicitação');
+                    console.error(err);
+                });
+        }
     </script>
 </body>
 
