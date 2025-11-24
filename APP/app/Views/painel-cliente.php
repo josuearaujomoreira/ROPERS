@@ -28,6 +28,8 @@ $lacador = $stmt->fetch(PDO::FETCH_ASSOC);
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <style>
     :root {
       --bg-light: #f5f6f6;
@@ -417,11 +419,11 @@ $lacador = $stmt->fetch(PDO::FETCH_ASSOC);
   </main>
 
   <footer>
-    <button class="active"><i>🏠</i>Início</button>
+    <button class="active"><i class="bi bi-house"></i>Início</button>
     <button onclick="window.location='/pwa/meu_evento'">
-      <i>🗓️</i> Meus Eventos
+     <i class="bi bi-calendar-check"></i> Meus Eventos
     </button>
-    <button onclick="abrirModal()"><i>👤</i>Perfil</button>
+    <button onclick="abrirModal()"><i class="bi bi-person-circle"></i>Perfil</button>
   </footer>
 
   <!-- MODAL PERFIL -->

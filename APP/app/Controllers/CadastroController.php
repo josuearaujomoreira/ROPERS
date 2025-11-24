@@ -83,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $lastId = $pdo->lastInsertId();
                 $_SESSION['usuario_id'] = $lastId;
+                echo "<script>Alert('Usuário Cadastro com Sucesso')</script>";
                 $_SESSION['usuario_nome'] = $nome;
                 header('Location: /pwa/painel-cliente');
                 exit;

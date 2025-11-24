@@ -32,6 +32,7 @@ $inscricoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <style>
         :root {
             --bg-light: #f5f6f6;
@@ -113,7 +114,7 @@ $inscricoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         footer a {
             background: none;
             color: var(--gray5);
-            font-size: 14px;
+            font-size: 20px;
             text-decoration: none;
             text-align: center;
             transition: 0.1s;
@@ -173,8 +174,8 @@ $inscricoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <footer>
-    <a href="/pwa/painel-cliente">🏠 Início</a>
-    <a href="/pwa/app/Views/meus_eventos.php">🗓️ Meus Eventos</a>
+    <a href="/pwa/painel-cliente"><i class="bi bi-house"></i> Início</a>
+    <a href="/pwa/app/Views/meus_eventos.php"><i class="bi bi-calendar-check"></i> Meus Eventos</a>
 </footer>
 
 </body>

@@ -10,7 +10,7 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $qtd_eventos = count($eventos);
 
 //Eventos Corredores/laçadores
-$stmt = $pdo->prepare("SELECT * FROM `corredores` ORDER BY id DESC");
+$stmt = $pdo->prepare("SELECT * FROM `lacadores` ORDER BY id DESC");
 $stmt->execute();
 $corredores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $qtd_corredores = count($corredores);

@@ -1,13 +1,16 @@
 <?php
 header('Content-Type: text/html; charset=UTF-8');
+ 
 
-  
 unset($_SESSION['nome']);
 unset($_SESSION['usuario_id']);
+
+
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,7 +53,7 @@ unset($_SESSION['usuario_id']);
       width: 90px;
       max-width: 40%;
       margin-bottom: 20px;
-      filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.15));
       border-radius: 10px !important;
     }
 
@@ -130,14 +133,22 @@ unset($_SESSION['usuario_id']);
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @media (max-width: 480px) {
       .container {
         padding: 25px 15px;
       }
+
       .logo {
         width: 80px;
       }
@@ -166,7 +177,7 @@ unset($_SESSION['usuario_id']);
   <script>
     const cpfInput = document.getElementById('cpf');
 
-    cpfInput.addEventListener('input', function (e) {
+    cpfInput.addEventListener('input', function(e) {
       let value = e.target.value.replace(/\D/g, '');
       if (value.length > 11) value = value.slice(0, 11);
 
@@ -182,4 +193,5 @@ unset($_SESSION['usuario_id']);
     });
   </script>
 </body>
+
 </html>
