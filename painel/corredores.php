@@ -248,7 +248,7 @@ $corredores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- MODAL EVENTOS E INSCRIÇÕES -->
     <div class="modal fade" id="modalEventos" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-dark text-white">
                     <h5 class="modal-title">Inscrições do Corredor</h5>
