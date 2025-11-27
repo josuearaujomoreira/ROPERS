@@ -41,8 +41,37 @@ $imagemPath = '/pwa_painel/uploads/' . htmlspecialchars($evento['imagem']);
 
   <link rel="manifest" href="/pwa/manifest.json">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <style>
+    .valor-box {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 12px 15px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid #e3e6ea;
+      max-width: 300px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+    }
+
+    .valor-label {
+      font-weight: bold;
+      color: #333;
+      font-size: 15px;
+    }
+
+    .valor-input {
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      font-weight: bold;
+      color: #28a745;
+      outline: none;
+      width: 120px;
+      text-align: right;
+    }
+
     :root {
       --bg-light: #f5f6f6;
       --gray7: #343434;
@@ -211,36 +240,80 @@ $imagemPath = '/pwa_painel/uploads/' . htmlspecialchars($evento['imagem']);
         <p><strong>Data:</strong> <?= $data_formatada ?></p>
 
         <p><strong>Local:</strong> <?= htmlspecialchars($evento['local']) ?></p>
-        <p><strong>Valor:</strong>
-          <?= htmlspecialchars($evento['valor']) ?>
-        </p>
+        <!-- VALOR -->
+        <div class="valor-box mt-3">
+          <span class="valor-currency">R$</span>
+
+          <!-- Mostra na tela -->
+          <input type="text" disabled id="inputValor" class="valor-input" value="0,00">
+
+        
+        </div>
 
         <form method="POST" action="/pwa/app/Views/salvar_inscricao.php">
           <input type="hidden" name="id_evento" value="<?= $id_evento ?>">
           <input type="hidden" name="id_lacador" value="<?= $id_cliente ?>">
+            <!-- Envia no POST -->
+          <input type="hidden" name="valor" id="valorHidden" value="0,00">
 
+          <!-- SOMATÓRIA / CATEGORIA -->
+          <label class="mt-3"><b>Escolher Somatória:</b></label>
+
+          <select class="form-select mt-1" name="id_categoria" id="selectCategoria" required>
+            <option value="">Escolha uma opção</option>
+
+            <?php
+            $stmt = $pdo->prepare("SELECT * FROM categorias_evento WHERE id_evento = ?");
+            $stmt->execute([$id_evento]);
+            $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($categorias as $cat) {
+              $valor_formatado = number_format($cat['valor'], 2, ',', '.');
+              echo '<option value="' . $cat['id'] . '" data-valor="' . $valor_formatado . '">'
+                . $cat['nome'] . ' - R$ ' . $valor_formatado .
+                '</option>';
+            }
+            ?>
+          </select>
+
+          <script>
+            document.getElementById('selectCategoria').addEventListener('change', function() {
+              const selected = this.options[this.selectedIndex];
+              const valor = selected.getAttribute('data-valor') || "0,00";
+
+              // Atualiza a tela
+              document.getElementById('inputValor').value = valor;
+
+              // Envia no POST
+              document.getElementById('valorHidden').value = valor;
+            });
+          </script>
+
+          <!-- TIPO -->
           <label class="mt-3"><b>Escolher modalidade:</b></label>
-          <select class="form-select mt-1" name="modalidade" required>
+          <select class="form-select mt-1" name="tipo" required>
             <option value="">Escolha uma opção</option>
             <option value="Pé">🔰 Pé</option>
             <option value="Cabeça">🔰 Cabeça</option>
             <option value="Ambos">🔰 Ambos</option>
           </select>
 
-          <button id="btnSubmit" type="submit" class="btn btn-dark w-100 mt-4" style="background: var(--gray7); position: relative;">
+          <button id="btnSubmit" type="submit" class="btn btn-dark w-100 mt-4">
             <span id="btnText">Confirmar Inscrição</span>
             <div id="spinner" class="spinner-border spinner-border-sm" style="display:none; position:absolute; right:15px; top:50%; transform:translateY(-50%);"></div>
           </button>
-
         </form>
+
+
+
       </div>
     </div>
 
   </main>
 
   <footer>
-    <a href="/pwa/painel-cliente">🏠 Início</a>
-    <a href="/pwa/painel-cliente">🗓️ Meus Eventos</a>
+    <a href="/pwa/painel-cliente"><i class="bi bi-house"></i> Início</a>
+    <a href="/pwa/app/Views/meus_eventos.php"><i class="bi bi-calendar-check"></i> Meus Eventos</a>
   </footer>
 
   <!-- MODAL FULLSCREEN -->
