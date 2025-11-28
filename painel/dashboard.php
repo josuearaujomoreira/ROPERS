@@ -26,6 +26,7 @@ $qtd_corredores = count($corredores);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         body {
             background-color: #f5f6f6;
@@ -161,7 +162,7 @@ $qtd_corredores = count($corredores);
                     <h4>Bem-vindo, <?= $_SESSION['nome'] ?></h4>
                     <p>Resumo rápido do painel.</p>
                 </div>
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" id="exportBtn">
                     <i class="bi bi-download"></i> Exportar Dados
                 </button>
             </div>
@@ -201,6 +202,79 @@ $qtd_corredores = count($corredores);
             } else {
                 logoImg.src = 'img/3.png';
             }
+        });
+    </script>
+
+    <!-- Modal for Export -->
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">Exportar Dados</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="spinner" class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Processando...</span>
+                        </div>
+                        <p>Processando dados...</p>
+                    </div>
+                    <div id="exportContent" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6>Dados Exportados</h6>
+                            <button id="downloadBtn" class="btn btn-success btn-sm">
+                                <i class="bi bi-download"></i> Baixar JSON
+                            </button>
+                        </div>
+                        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 10px;">
+                            <pre id="jsonData" style="margin: 0; font-size: 0.875rem;"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            const modal = new bootstrap.Modal(document.getElementById('exportModal'));
+            modal.show();
+
+            // Show spinner
+            document.getElementById('spinner').style.display = 'block';
+            document.getElementById('exportContent').style.display = 'none';
+
+            // Fetch data
+            fetch('export_data.php')
+                .then(response => response.json())
+                .then(data => {
+                    // Hide spinner
+                    document.getElementById('spinner').style.display = 'none';
+                    document.getElementById('exportContent').style.display = 'block';
+
+                    // Display JSON
+                    document.getElementById('jsonData').textContent = JSON.stringify(data, null, 2);
+
+                    // Setup download button
+                    document.getElementById('downloadBtn').addEventListener('click', function() {
+                        const blob = new Blob([JSON.stringify(data, null, 2)], {
+                            type: 'application/json'
+                        });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'dados_exportados.json';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('spinner').innerHTML = '<p>Erro ao processar dados.</p>';
+                });
         });
     </script>
 

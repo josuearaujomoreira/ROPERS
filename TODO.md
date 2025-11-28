@@ -1,0 +1,2 @@
+- [x] Create painel/export_data.php to fetch and return JSON data for eventos, corredores, inscricoes
+- [x] Update painel/dashboard.php to add modal with spinner and JavaScript for export functionality

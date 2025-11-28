@@ -99,6 +99,10 @@ $inscricoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background: #c62828;
         }
 
+        .reprovado {
+            background: #c62828;
+        }
+
         footer {
             background: #fff;
             border-top: 1px solid #ddd;

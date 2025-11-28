@@ -7,7 +7,8 @@ checkLogin();
 require 'inc/config.php';
 
 
-function limparValor($valor) {
+function limparValor($valor)
+{
     $valor = str_replace(['R$', ' ', '.'], '', $valor);
     $valor = str_replace(',', '.', $valor);
     return floatval($valor);
@@ -18,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nome'])) {
     $nome = trim($_POST['nome']);
     $data_evento = $_POST['data_evento'];
     $status = $_POST['status'];
+    $obs = $_POST['obs'];
     $local = trim($_POST['local']);
     $imagem = '';
     $file = '';
@@ -43,9 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nome'])) {
     }
 
     // 👉 SALVA O EVENTO
-    $stmt = $pdo->prepare("INSERT INTO eventos (nome, data, local, imagem, status, file)
-                           VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$nome, $data_evento, $local, $imagem, $status, $file]);
+    $stmt = $pdo->prepare("INSERT INTO eventos (nome, data, local, imagem, status, file, obs)
+                           VALUES (?, ?, ?, ?, ?, ?,?)");
+    $stmt->execute([$nome, $data_evento, $local, $imagem, $status, $file, $obs]);
 
     // ID do evento recém cadastrado
     $id_evento = $pdo->lastInsertId();
@@ -168,6 +170,10 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             object-fit: cover;
             border-radius: 5px;
         }
+
+        .form-label {
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -223,9 +229,14 @@ $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-8 mb-6">
+                            <div class="col-md-6 mb-6">
                                 <label class="form-label">Local</label>
                                 <input type="text" name="local" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-6">
+                                <label class="form-label">Observação</label>
+
+                                <textarea name="obs" id="" class="form-control"></textarea>
                             </div>
                         </div>
 

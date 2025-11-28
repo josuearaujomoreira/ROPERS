@@ -299,9 +299,9 @@ $corredores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     if (data.success) {
                         alert("Inscrição atualizada!")
 
-                        setTimeout(function() {
+                      /*   setTimeout(function() {
                             window.location.href = "";
-                        }, 100);
+                        }, 100); */
 
                         // Recarrega a lista de eventos do corredor
                         const modal = bootstrap.Modal.getInstance(document.getElementById('modalEventos'));

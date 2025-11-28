@@ -96,6 +96,9 @@
                                     case 'Reprovado':
                                         $status_class = 'badge-reprovado';
                                         break;
+                                    default:
+                                        $status_class = 'badge-pendente';
+                                        break;
                                 }
                                 ?>
                                 <span class="badge <?= $status_class ?>"><?= htmlspecialchars($insc['status']) ?></span>

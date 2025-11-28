@@ -17,11 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("UPDATE inscricoes SET status = ? WHERE id = ?");
         $stmt->execute([$status, $inscricao_id]);
 
-        echo json_encode(['success' => true, 'message' => 'Status atualizado com sucesso']);
+        echo json_encode(['success' => true, 'message' => '-->' . $status . '-Status atualizado com sucesso']);
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => 'Erro ao atualizar: ' . $e->getMessage()]);
     }
 } else {
     echo json_encode(['success' => false, 'message' => 'Método não permitido']);
 }
-?>

@@ -240,6 +240,14 @@ $imagemPath = '/pwa_painel/uploads/' . htmlspecialchars($evento['imagem']);
         <p><strong>Data:</strong> <?= $data_formatada ?></p>
 
         <p><strong>Local:</strong> <?= htmlspecialchars($evento['local']) ?></p>
+
+        <?php if (!empty($evento['obs'])): ?>
+        <p><strong>Observação:</strong>
+          <?= htmlspecialchars($evento['obs']) ?>
+        </p>
+        <?php endif; ?>
+
+
         <!-- VALOR -->
         <div class="valor-box mt-3">
           <span class="valor-currency">R$</span>
@@ -247,13 +255,13 @@ $imagemPath = '/pwa_painel/uploads/' . htmlspecialchars($evento['imagem']);
           <!-- Mostra na tela -->
           <input type="text" disabled id="inputValor" class="valor-input" value="0,00">
 
-        
+
         </div>
 
         <form method="POST" action="/pwa/app/Views/salvar_inscricao.php">
           <input type="hidden" name="id_evento" value="<?= $id_evento ?>">
           <input type="hidden" name="id_lacador" value="<?= $id_cliente ?>">
-            <!-- Envia no POST -->
+          <!-- Envia no POST -->
           <input type="hidden" name="valor" id="valorHidden" value="0,00">
 
           <!-- SOMATÓRIA / CATEGORIA -->
