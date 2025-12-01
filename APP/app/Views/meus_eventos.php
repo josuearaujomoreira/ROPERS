@@ -13,7 +13,7 @@ $nome = $_SESSION['nome'] ?? "Laçador";
 
 // Buscar inscrições + dados dos eventos
 $stmt = $pdo->prepare("
-    SELECT i.*, e.nome AS evento_nome, e.data AS evento_data, e.local AS evento_local, e.imagem 
+    SELECT i.*, e.nome AS evento_nome, e.data AS evento_data, e.local AS evento_local, e.imagem, e.obs
     FROM inscricoes i
     JOIN eventos e ON e.id = i.id_evento
     WHERE i.id_lacador = ?
@@ -161,6 +161,9 @@ $inscricoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <p class="mb-1"><strong>📅 Data:</strong> <?= $data_formatada ?></p>
                 <p class="mb-1"><strong>📍 Local:</strong> <?= htmlspecialchars($i['evento_local']) ?></p>
                 <p class="mb-1"><strong>🎯 Modalidade:</strong> <?= htmlspecialchars($i['tipo']) ?></p>
+                <?php if (!empty($i['obs'])): ?>
+                    <p class="mb-1"><strong>📝 Observação:</strong> <?= htmlspecialchars($i['obs']) ?></p>
+                <?php endif; ?>
 
                 <!-- STATUS COLORIDO -->
                 <?php

@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require __DIR__ . '/../Config/database.php';
 session_start();
 
@@ -48,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute($params);
             $_SESSION['nome'] = $nome;
             header('Location: /pwa/painel-cliente?update=1');
+            ob_end_flush();
             exit;
         } catch (PDOException $e) {
             $erro = "Erro ao atualizar perfil: " . $e->getMessage();
@@ -86,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo "<script>Alert('Usuário Cadastro com Sucesso')</script>";
                 $_SESSION['usuario_nome'] = $nome;
                 header('Location: /pwa/painel-cliente');
+                ob_end_flush();
                 exit;
             } catch (PDOException $e) {
                 if ($e->getCode() == 23000) {
